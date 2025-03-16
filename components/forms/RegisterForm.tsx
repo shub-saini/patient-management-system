@@ -49,13 +49,6 @@ const RegisterForm = ({ user }: { user: User }) => {
       values.identificationDocument &&
       values.identificationDocument?.length > 0
     ) {
-      //   const blobFile = new Blob([values.identificationDocument[0]], {
-      //     type: values.identificationDocument[0].type,
-      //   });
-
-      //   formData = new FormData();
-      //   formData.append("blobFile", blobFile);
-      //   formData.append("fileName", values.identificationDocument[0].name);
       const file = values.identificationDocument[0];
       formData = new FormData();
       formData.append("file", file);
@@ -166,17 +159,20 @@ const RegisterForm = ({ user }: { user: User }) => {
                 <FormControl>
                   <RadioGroup
                     className='flex h-11 gap-6 xl:justify-between'
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    onValueChange={(value) => {
+                      // Ensure the value is lowercase before setting it
+                      field.onChange(value.toLowerCase());
+                    }}
+                    defaultValue={field.value || "male"}
                   >
                     {GenderOptions.map((option, i) => (
                       <div
                         key={option + i}
-                        className=' flex h-full flex-1 items-center gap-2 rounded-md border border-dashed border-dark-500 bg-dark-400 p-3'
+                        className='flex h-full flex-1 items-center gap-2 rounded-md border border-dashed border-dark-500 bg-dark-400 p-3'
                       >
                         <RadioGroupItem value={option} id={option} />
                         <Label htmlFor={option} className='cursor-pointer'>
-                          {option}
+                          {option.charAt(0).toUpperCase() + option.slice(1)}
                         </Label>
                       </div>
                     ))}

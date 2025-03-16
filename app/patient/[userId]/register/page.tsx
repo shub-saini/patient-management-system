@@ -13,23 +13,25 @@ const Register = async ({
   const user = await getUser(userId);
   const patient = await getPatient(userId);
 
-  if (patient) redirect(`/patients/${userId}/new-appointment`);
+  if (patient) redirect(`/patient/${userId}/new-appointment`);
 
   return (
-    <div className='flex h-screen max-h-screen'>
-      <section className='remove-scrollbar container'>
-        <div className='mx-auto flex size-full max-w-[860px] flex-1 flex-col py-10'>
-          <Image
-            src='/assets/icons/logo-full.svg'
-            height={1000}
-            width={1000}
-            alt='patient'
-            className='mb-12 h-10 w-fit'
-          />
+    <div className='flex min-h-screen overflow-hidden'>
+      <section className='remove-scrollbar flex-1 overflow-y-auto'>
+        <div className='flex min-h-full w-full items-center justify-center px-4 py-6 sm:px-6 lg:px-8'>
+          <div className='w-full max-w-[860px] flex flex-col'>
+            <Image
+              src='/assets/icons/logo-full.svg'
+              height={1000}
+              width={1000}
+              alt='patient'
+              className='mb-8 md:mb-12 h-8 md:h-10 w-fit'
+            />
 
-          <RegisterForm user={user} />
+            <RegisterForm user={user} />
 
-          <p className='copyright py-12'>© 2024 CarePluse</p>
+            <p className='copyright py-6 md:py-12'>© 2024 CarePluse</p>
+          </div>
         </div>
       </section>
 
@@ -38,7 +40,7 @@ const Register = async ({
         height={1000}
         width={1000}
         alt='patient'
-        className='side-img max-w-[390px]'
+        className='hidden h-screen w-[390px] object-cover lg:block'
       />
     </div>
   );

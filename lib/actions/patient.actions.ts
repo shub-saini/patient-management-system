@@ -62,37 +62,47 @@ export const registerPatient = async ({
   ...patient
 }: RegisterUserParams) => {
   try {
-    // Upload file ->  // https://appwrite.io/docs/references/cloud/client-web/storage#createFile
+    // Upload file
     let file;
     if (identificationDocument) {
       const inputFile =
         identificationDocument &&
         InputFile.fromBuffer(
-          identificationDocument?.get("blobFile") as Blob,
+          identificationDocument?.get("file") as Blob,
           identificationDocument?.get("fileName") as string
         );
 
       file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
     }
 
-    // Create new patient document -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#createDocument
+    console.log("Original gender value:", patient.gender);
+
+    // Force the gender value to be one of the allowed values
+    let genderValue = "male";
+    if (patient.gender === "female" || patient.gender === "other") {
+      genderValue = patient.gender;
+    }
+
+    console.log("Corrected gender value:", genderValue);
+
+    // Create new patient document with shorter URL and fixed gender
     const newPatient = await databases.createDocument(
       DATABASE_ID!,
       PATIENT_COLLECTION_ID!,
       ID.unique(),
       {
-        identificationDocumentId: file?.$id ? file.$id : null,
-        identificationDocumentUrl: file?.$id
-          ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view??project=${PROJECT_ID}`
-          : null,
+        identificationDocumentId: file?.$id || null,
+        // Create a shorter URL reference instead of full URL
+        identificationDocumentUrl: file?.$id ? `/files/${file.$id}` : null,
         ...patient,
+        gender: genderValue, // Force the correct gender value
       }
     );
-    console.log(newPatient);
 
     return parseStringify(newPatient);
   } catch (error) {
     console.error("An error occurred while creating a new patient:", error);
+    throw error; // Re-throw to handle in the UI
   }
 };
 

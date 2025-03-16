@@ -1,0 +1,11 @@
+.bg-appointments {
+  background: linear-gradient(45deg, #2dc2a5 0%, #1b8e7a 100%);
+}
+
+.bg-pending {
+  background: linear-gradient(45deg, #ff9f43 0%, #e67e22 100%);
+}
+
+.bg-cancelled {
+  background: linear-gradient(45deg, #ff5252 0%, #e53935 100%);
+}

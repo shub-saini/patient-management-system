@@ -5,7 +5,38 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const parseStringify = (value: any) => JSON.parse(JSON.stringify(value));
+export const parseStringify = (value: any) => {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  try {
+    // Handle special cases for File objects and FormData
+    if (value instanceof File || value instanceof FormData) {
+      return value;
+    }
+
+    // For objects that might contain File or FormData
+    if (typeof value === "object") {
+      const parsed = JSON.parse(
+        JSON.stringify(value, (key, val) => {
+          // Preserve File and FormData objects
+          if (val instanceof File || val instanceof FormData) {
+            return val;
+          }
+          return val;
+        })
+      );
+      return parsed;
+    }
+
+    // For primitive values
+    return JSON.parse(JSON.stringify(value));
+  } catch (error) {
+    console.warn("parseStringify warning:", error);
+    return value;
+  }
+};
 
 export const convertFileToUrl = (file: File) => URL.createObjectURL(file);
 

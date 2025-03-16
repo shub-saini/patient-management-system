@@ -23,7 +23,7 @@ import { decryptKey, encryptKey } from "@/lib/utils";
 export const PasskeyModal = () => {
   const router = useRouter();
   const path = usePathname();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true); // Always start open
   const [passkey, setPasskey] = useState("");
   const [error, setError] = useState("");
 
@@ -32,21 +32,27 @@ export const PasskeyModal = () => {
       ? window.localStorage.getItem("accessKey")
       : null;
 
+  // Remove or modify this useEffect to prevent auto-redirect
   useEffect(() => {
-    const accessKey = encryptedKey && decryptKey(encryptedKey);
+    // Only auto-redirect if we're already on the /admin page
+    // This prevents direct access to /admin without passkey
+    if (path === "/admin") {
+      const accessKey = encryptedKey && decryptKey(encryptedKey);
 
-    if (path)
       if (accessKey === process.env.NEXT_PUBLIC_ADMIN_PASSKEY!.toString()) {
-        setOpen(false);
-        router.push("/admin");
+        setOpen(false); // Keep admin page accessible
       } else {
-        setOpen(true);
+        router.push("/"); // Redirect to home if no valid key
       }
-  }, [encryptedKey]);
+    }
+  }, [encryptedKey, path, router]);
 
   const closeModal = () => {
     setOpen(false);
-    router.push("/");
+    // Only redirect on close if we're on the admin page
+    if (path === "/admin") {
+      router.push("/");
+    }
   };
 
   const validatePasskey = (
@@ -56,10 +62,9 @@ export const PasskeyModal = () => {
 
     if (passkey === process.env.NEXT_PUBLIC_ADMIN_PASSKEY) {
       const encryptedKey = encryptKey(passkey);
-
       localStorage.setItem("accessKey", encryptedKey);
-
       setOpen(false);
+      router.push("/admin");
     } else {
       setError("Invalid passkey. Please try again.");
     }
